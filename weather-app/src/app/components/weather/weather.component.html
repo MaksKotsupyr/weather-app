@@ -1,0 +1,169 @@
+<div class="container">
+    <div class="dropdown">
+        <mat-form-field appearance="fill">
+            <mat-label>Select City</mat-label>
+            <mat-select [(value)]="selectedCity" (selectionChange)="onCitySelectionChange()">
+                <mat-option *ngFor="let cityObj of cities" [value]="cityObj">{{ cityObj.city }}</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <div *ngIf="errorMessage" class="error-message">
+            {{ errorMessage }}
+        </div>
+    </div>
+    <div class="content" *ngIf="!errorMessage">
+        <div class="card">
+            <div class="card-header">
+                <div class="city-weather">
+                    <div class="weather-icon">
+                        <img [src]="getWeatherImage()" alt="Weather Icon">
+                    </div>
+                    <div class="weather-city-data">
+                        <h1>{{selectedCity.city}}</h1>
+                        <h5>{{currentDate}}</h5>
+                        <div class="hr"></div>
+                        <h3> {{displayedWeatherData.weather}}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="body-header">
+                    <span>Today's Highlights</span>
+                    <mat-button-toggle-group class="unit-toggle" name="unitToggle" aria-label="Unit Toggle"
+                        (change)="onUnitToggleChange($event)">
+                        <mat-button-toggle value="celsius" checked>°C</mat-button-toggle>
+                        <mat-button-toggle value="fahrenheit">°F</mat-button-toggle>
+                    </mat-button-toggle-group>
+                </div>
+                <div class="weather-cards">
+                    <div class="weather-data">
+                        <div class="weather-card-header">
+                            <mat-icon>thermostat</mat-icon>
+                            <span class="label"> Temperature:</span>
+                        </div>
+                        <span class="value">{{ displayedWeatherData.temp }}{{selectedUnit === 'celsius' ? '°C' :
+                            '°F'}}</span>
+                        <span class="fill">FEELS LIKE {{displayedWeatherData.app_temp }}{{selectedUnit === 'celsius' ?
+                            '°C' : '°F'}}</span>
+                    </div>
+                    <div class="weather-data">
+                        <div class="weather-card-header">
+                            <mat-icon>speed</mat-icon>
+                            <span class="label"> Pressure:</span>
+                        </div>
+                        <span class="value">{{ displayedWeatherData.pres }} mbar</span>
+                    </div>
+                    <div class="weather-data">
+                        <div class="weather-card-header">
+                            <mat-icon>cloud</mat-icon>
+                            <span class="label"> Clouds:</span>
+                        </div>
+                        <span class="value">{{ displayedWeatherData.clouds }}%</span>
+                    </div>
+                    <div class="weather-data">
+                        <div class="weather-card-header">
+                            <mat-icon>waves</mat-icon>
+                            <span class="label">Wind Speed:</span>
+                        </div>
+                        <span class="value">{{ displayedWeatherData.wind_spd.toFixed(2) }} km/h</span>
+                        <div class="arrow">
+                            <div class="arrow-block">
+                                <mat-icon class="arrow-icon"
+                                    [style.transform]="'rotate(' + ( -(180 - displayedWeatherData.wind_dir ))+ 'deg)'">
+                                    place
+                                </mat-icon>
+                            </div>
+                            <span>{{displayedWeatherData.wind_cdir_full}}</span>
+                        </div>
+                    </div>
+                    <div class="weather-data">
+                        <div class="weather-card-header humidity">
+                            <mat-icon>opacity</mat-icon>
+                            <span class="label">Relative Humidity:</span>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100" width="70"
+                            height="70">
+                            <defs>
+                                <linearGradient id="grad" x1="0%" y1="100%" x2="0%" y2="0%">
+                                    <stop [attr.offset]="displayedWeatherData.rh + '%'" stop-color="#00AEEF" />
+                                    <stop [attr.offset]="displayedWeatherData.rh + '%'" stop-color="#FFFFFF" />
+                                </linearGradient>
+                            </defs>
+                            <path d="M50,10
+                              c-20,30 -50,60 0,80
+                              c50,-20 20,-50 0,-80z" [attr.fill]="'url(#grad)'" stroke="#000" stroke-width="2"
+                                stroke-linecap="round" />
+                        </svg>
+                        <h3 class="value">{{ displayedWeatherData.rh }}%</h3>
+                    </div>
+                    <div class="weather-data sun">
+                        <div class="sunrise">
+                            <mat-icon>brightness_5</mat-icon>
+                            <span class="label">Sunrise: </span>
+                            <span class="value"> {{ displayedWeatherData.sunrise }}</span>
+                        </div>
+                        <div class="sunset">
+                            <mat-icon>brightness_4</mat-icon>
+                            <span class="label">Sunset: </span>
+                            <span class="value"> {{ displayedWeatherData.sunset }}</span>
+                        </div>
+                    </div>
+
+                </div>
+                <!--  <div class="weather-card">
+                    <div class="weather-info">
+                        <div class="weather-data">
+                            <mat-icon>thermostat</mat-icon>
+                            <span class="label">Temperature:</span>
+                            <span class="value">{{ displayedWeatherData.temp }}{{selectedUnit === 'celsius' ? '°C' : '°F'}}</span>
+                        </div>
+                        <div class="weather-data">
+                            <mat-icon>wb_sunny</mat-icon>
+                            <span class="label">Feels Like:</span>
+                            <span class="value">{{ displayedWeatherData.app_temp }}{{selectedUnit === 'celsius' ? '°C' : '°F'}}</span>
+                        </div>
+                        <div class="weather-data">
+                            <mat-icon>cloud</mat-icon>
+                            <span class="label">Clouds:</span>
+                            <span class="value">{{ displayedWeatherData.clouds }}%</span>
+                        </div>
+                        <div class="weather-data">
+                            <mat-icon>navigation</mat-icon>
+                            <span class="label">Wind Speed:</span>
+                            <span class="value">{{ displayedWeatherData.wind_spd }} m/s</span>
+                        </div>
+                        <div class="weather-data">
+                            <mat-icon>wb_sunny</mat-icon>
+                            <span class="label">Period of Day:</span>
+                            <span class="value">{{ displayedWeatherData.pod == 'n' ? 'Night' : 'Day' }}</span>
+                        </div>
+                        <div class="weather-data">
+                            <mat-icon>speed</mat-icon>
+                            <span class="label">Pressure:</span>
+                            <span class="value">{{ displayedWeatherData.pres }} mbar</span>
+                        </div>
+                        <div class="weather-data">
+                            <mat-icon>opacity</mat-icon>
+                            <span class="label">Relative Humidity:</span>
+                            <span class="value">{{ displayedWeatherData.rh }}%</span>
+                        </div>
+                        <div class="weather-data">
+                            <mat-icon>brightness_5</mat-icon>
+                            <span class="label">Sunrise:</span>
+                            <span class="value">{{ displayedWeatherData.sunrise }}</span>
+                        </div>
+                        <div class="weather-data">
+                            <mat-icon>brightness_4</mat-icon>
+                            <span class="label">Sunset:</span>
+                            <span class="value">{{ displayedWeatherData.sunset }}</span>
+                        </div>
+                        <div class="weather-data">
+                            <mat-icon>navigation</mat-icon>
+                            <span class="label">Wind Direction:</span>
+                            <span class="value">{{ displayedWeatherData.wind_cdir_full }}</span>
+                        </div>
+                    </div>
+                </div>-->
+            </div>
+        </div>
+    </div>
+</div>
